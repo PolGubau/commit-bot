@@ -3,9 +3,9 @@ import subprocess
 from datetime import datetime, timedelta
 
 # Configuración inicial
-start_date = datetime(2016, 1, 1)
+start_date = datetime(2025, 1, 1)
 end_date = datetime.today()
-repo_path = "/ruta/a/tu/repositorio"  # Cambia esta ruta al repositorio local
+repo_path = "C:\\Users\\pol.gubau\\dev\\other\\bots\\commited\\commits-simulator"
 
 # Cambiar al directorio del repositorio
 os.chdir(repo_path)
@@ -22,7 +22,7 @@ commit_count = 0
 
 while current_date <= end_date:
     # Escribir algo en el archivo
-    with open(file_path, "a") as file:
+    with open(file_path, "w") as file:
         file.write(f"Commit del día {current_date.strftime('%Y-%m-%d')}\n")
 
     # Configurar las fechas de los commits
@@ -45,8 +45,28 @@ while current_date <= end_date:
 
 print(f"Se realizaron {commit_count} commits en el repositorio.")
 
+
+# Verifica si el remoto 'origin' ya existe, si no, agregarlo
+
+
+
+
 # Opcional: hacer push al repositorio remoto
-remote_repo = "https://github.com/usuario/repositorio.git"  # Cambia esta URL
-subprocess.run(["git", "remote", "add", "origin", remote_repo], check=True)
+# token = os.getenv("GITHUB_TOKEN")
+# remote_repo = f"https://HackedPol:{token}@github.com/HackedPol/commits-simulator.git"
+
+# Asegúrate de que el token esté configurado correctamente
+token = os.getenv("GITHUB_TOKEN")  # Recibe el valor de la variable de entorno
+if not token:
+    raise ValueError("El token de GitHub no está configurado")
+remote_repo = f"https://{token}:x-oauth-basic@github.com/HackedPol/commits-simulator.git"
+
+
+remote_check = subprocess.run(["git", "remote", "get-url", "origin"], capture_output=True, text=True)
+if remote_check.returncode != 0:  # Si no existe, se crea
+    subprocess.run(["git", "remote", "add", "origin", remote_repo], check=True)
+else:  # Si ya existe, se actualiza
+    subprocess.run(["git", "remote", "set-url", "origin", remote_repo], check=True)
+
 subprocess.run(["git", "branch", "-M", "main"], check=True)
 subprocess.run(["git", "push", "-u", "origin", "main"], check=True)
